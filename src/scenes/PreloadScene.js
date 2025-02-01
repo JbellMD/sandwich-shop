@@ -29,13 +29,13 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('ingredient_button', 'assets/images/ui/ingredient_button.png');
         this.load.image('stack_area', 'assets/images/ui/stack_area.png');
 
+        // Load background
+        this.load.image('background', 'assets/images/ui/background.jpg');
+
         // Load customer avatars
         this.load.image('customer1', 'assets/images/customers/customer1.png');
         this.load.image('customer2', 'assets/images/customers/customer2.png');
         this.load.image('customer3', 'assets/images/customers/customer3.png');
-
-        // Load background
-        this.load.image('background', 'assets/images/ui/background.png');
     }
 
     createLoadingBar() {
