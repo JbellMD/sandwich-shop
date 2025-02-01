@@ -67,6 +67,14 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     create() {
+        // Add background
+        const bg = this.add.image(400, 300, 'background');
+        // Scale the background to fit the game width while maintaining aspect ratio
+        const scaleX = 800 / bg.width;
+        const scaleY = 600 / bg.height;
+        const scale = Math.min(scaleX, scaleY);
+        bg.setScale(scale);
+
         this.scene.start('MenuScene');
     }
 }

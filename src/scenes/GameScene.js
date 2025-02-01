@@ -14,11 +14,42 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // Add background
-        this.add.image(400, 300, 'background');
-        
+        // Add background with fade in
+        const bg = this.add.image(400, 300, 'background');
+        const scaleX = 800 / bg.width;
+        const scaleY = 600 / bg.height;
+        const scale = Math.min(scaleX, scaleY);
+        bg.setScale(scale);
+        bg.alpha = 0;
+
+        // Setup UI and ingredients
         this.setupUI();
         this.setupIngredients();
+        
+        // Fade in all elements
+        this.tweens.add({
+            targets: [bg],
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2'
+        });
+
+        // Add fade-in effect for UI elements
+        const uiElements = [...this.children.list].filter(child => child !== bg);
+        uiElements.forEach((element, index) => {
+            element.alpha = 0;
+            this.tweens.add({
+                targets: element,
+                alpha: 1,
+                duration: 400,
+                ease: 'Power2',
+                delay: 100 + (index * 50)
+            });
+        });
+
+        // Add camera fade in
+        this.cameras.main.fadeIn(500);
+
         this.setupStackArea();
         this.setupCustomerQueue();
         this.createNewOrder();
@@ -244,6 +275,14 @@ export default class GameScene extends Phaser.Scene {
             backgroundColor: '#ffffff',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5);
+    }
+
+    gameOver() {
+        // Add fade out transition before switching to GameOverScene
+        this.cameras.main.fade(1000, 0, 0, 0);
+        this.time.delayedCall(900, () => {
+            this.scene.start('GameOverScene', { score: this.score });
+        });
     }
 
     update() {
