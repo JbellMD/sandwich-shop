@@ -3,14 +3,12 @@ export default class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.score = 0;
         this.currentOrder = null;
-        this.sandwichStack = [];
-        this.stackDisplay = [];
+        this.stack = [];
     }
 
     init() {
         this.score = 0;
-        this.sandwichStack = [];
-        this.stackDisplay = [];
+        this.stack = [];
     }
 
     create() {
@@ -50,94 +48,166 @@ export default class GameScene extends Phaser.Scene {
         // Add camera fade in
         this.cameras.main.fadeIn(500);
 
-        this.setupStackArea();
-        this.setupCustomerQueue();
         this.createNewOrder();
     }
 
     setupUI() {
-        // Add order box
-        this.add.image(400, 60, 'order_box');
-        
-        // Score display
-        this.scoreText = this.add.text(16, 16, 'Score: 0', {
+        // Create score text with better styling
+        const scoreStyle = {
             fontSize: '32px',
-            fill: '#000',
-            backgroundColor: '#ffffff',
-            padding: { x: 10, y: 5 }
-        });
+            fontFamily: 'Arial Black',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4,
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                color: '#000000',
+                blur: 4,
+                fill: true
+            }
+        };
+        
+        this.scoreText = this.add.text(20, 20, 'Score: 0', scoreStyle);
+        this.score = 0;
 
-        // Timer bar background
-        this.timerBarBg = this.add.image(400, 580, 'timer_bar_bg');
-        this.timerBar = this.add.image(400, 580, 'timer_bar_fill');
-        this.timerBar.setOrigin(0, 0.5);
-        this.timerBar.x = 250; // Adjust based on your timer_bar_bg width
+        // Create dialogue box for orders
+        const dialogueBoxWidth = 400;
+        const dialogueBoxHeight = 80;
+        const dialogueBox = this.add.graphics();
+        
+        // Add semi-transparent background
+        dialogueBox.fillStyle(0x000000, 0.7);
+        dialogueBox.fillRoundedRect(400, 20, dialogueBoxWidth, dialogueBoxHeight, 15);
+        
+        // Add border
+        dialogueBox.lineStyle(3, 0xffffff, 1);
+        dialogueBox.strokeRoundedRect(400, 20, dialogueBoxWidth, dialogueBoxHeight, 15);
+        
+        // Add decorative elements
+        dialogueBox.lineStyle(2, 0xffffff, 0.5);
+        dialogueBox.strokeRoundedRect(405, 25, dialogueBoxWidth - 10, dialogueBoxHeight - 10, 12);
+
+        // Create order text with typing effect style
+        const orderTextStyle = {
+            fontSize: '24px',
+            fontFamily: 'Arial',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 2,
+            wordWrap: { width: dialogueBoxWidth - 40 }
+        };
+
+        this.orderText = this.add.text(420, 40, '', orderTextStyle);
+
+        // Timer bar with enhanced styling
+        const timerBarWidth = 300;
+        const timerBarHeight = 20;
+        
+        // Timer bar background with gradient
+        const timerBarBg = this.add.graphics();
+        timerBarBg.fillStyle(0x333333, 1);
+        timerBarBg.fillRoundedRect(250, 550, timerBarWidth, timerBarHeight, 10);
+        timerBarBg.lineStyle(2, 0x000000);
+        timerBarBg.strokeRoundedRect(250, 550, timerBarWidth, timerBarHeight, 10);
+
+        // Timer bar fill
+        this.timerBar = this.add.graphics();
+        this.timerBar.setDepth(1);
+        
+        // Store timer bar properties
+        this.timerBarConfig = {
+            x: 250,
+            y: 550,
+            width: timerBarWidth,
+            height: timerBarHeight
+        };
     }
 
     setupIngredients() {
-        const leftIngredients = [
-            'bread_top', 'bread_bottom', 'lettuce',
-            'cheese', 'tomato', 'meat'
-        ];
-
-        const rightIngredients = [
-            'bacon', 'egg', 'mayo',
-            'mustard', 'ketchup', 'onion'
-        ];
-
+        const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
+        const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
+        
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
-            const button = this.add.image(100, 150 + (index * 70), 'ingredient_button');
-            const ingredientSprite = this.add.image(100, 150 + (index * 70), ingredient);
+            const x = 150;
+            const y = 200 + (index * 60);
             
+            // Add button background
+            const button = this.add.image(x, y, 'ingredient_button');
+            
+            // Add ingredient icon
+            const ingredientIcon = this.add.image(x, y, ingredient);
+            ingredientIcon.setScale(0.8); // Slightly smaller scale for better fit
+            
+            // Make both interactive
             button.setInteractive();
-            ingredientSprite.setInteractive();
+            ingredientIcon.setInteractive();
             
-            button.on('pointerdown', () => this.addIngredient(ingredient));
-            ingredientSprite.on('pointerdown', () => this.addIngredient(ingredient));
+            // Store ingredient name
+            button.ingredient = ingredient;
+            ingredientIcon.ingredient = ingredient;
             
-            // Add hover effect
-            button.on('pointerover', () => button.setTint(0xdddddd));
-            button.on('pointerout', () => button.clearTint());
+            // Setup interactions for both button and icon
+            this.setupIngredientInteraction(button);
+            this.setupIngredientInteraction(ingredientIcon);
         });
-
+        
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
-            const button = this.add.image(700, 150 + (index * 70), 'ingredient_button');
-            const ingredientSprite = this.add.image(700, 150 + (index * 70), ingredient);
+            const x = 650;
+            const y = 200 + (index * 60);
             
+            // Add button background
+            const button = this.add.image(x, y, 'ingredient_button');
+            
+            // Add ingredient icon
+            const ingredientIcon = this.add.image(x, y, ingredient);
+            ingredientIcon.setScale(0.8); // Slightly smaller scale for better fit
+            
+            // Make both interactive
             button.setInteractive();
-            ingredientSprite.setInteractive();
+            ingredientIcon.setInteractive();
             
-            button.on('pointerdown', () => this.addIngredient(ingredient));
-            ingredientSprite.on('pointerdown', () => this.addIngredient(ingredient));
+            // Store ingredient name
+            button.ingredient = ingredient;
+            ingredientIcon.ingredient = ingredient;
             
-            // Add hover effect
-            button.on('pointerover', () => button.setTint(0xdddddd));
-            button.on('pointerout', () => button.clearTint());
+            // Setup interactions for both button and icon
+            this.setupIngredientInteraction(button);
+            this.setupIngredientInteraction(ingredientIcon);
+        });
+    }
+
+    setupIngredientInteraction(object) {
+        object.on('pointerdown', () => this.addIngredient(object.ingredient));
+        
+        // Add hover effect
+        object.on('pointerover', () => {
+            if (object.texture.key === 'ingredient_button') {
+                object.setTint(0xdddddd);
+            } else {
+                object.setScale(0.9); // Slightly larger on hover for ingredients
+            }
+        });
+        
+        object.on('pointerout', () => {
+            if (object.texture.key === 'ingredient_button') {
+                object.clearTint();
+            } else {
+                object.setScale(0.8); // Return to normal scale
+            }
         });
     }
 
     setupStackArea() {
-        // Add stack area background
-        this.add.image(400, 300, 'stack_area');
-        
-        this.add.text(400, 150, 'Sandwich Stack', {
-            fontSize: '24px',
-            fill: '#000',
-            backgroundColor: '#ffffff',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5);
-    }
-
-    setupCustomerQueue() {
-        // Placeholder for customer queue
-        this.customerQueue = [];
-        this.maxCustomers = 3;
-        
-        // Add initial customer
-        const customer = this.add.image(100, 60, 'customer1');
-        customer.setScale(0.5);
+        // Remove the stack area background and text, just handle the stacking logic
+        this.stackArea = {
+            x: 400,
+            y: 300,
+            width: 200,
+            height: 300
+        };
     }
 
     createNewOrder() {
@@ -148,7 +218,7 @@ export default class GameScene extends Phaser.Scene {
         };
 
         // Display order
-        this.displayOrder();
+        this.displayOrder(this.currentOrder.ingredients);
 
         // Start timer
         this.orderTimer = this.time.addEvent({
@@ -159,31 +229,31 @@ export default class GameScene extends Phaser.Scene {
     }
 
     addIngredient(ingredient) {
-        this.sandwichStack.push(ingredient);
+        // Add to stack array
+        this.stack.push(ingredient);
         
-        // Create a new ingredient display in the stack area
-        const yPos = 450 - (this.stackDisplay.length * 40);
+        // Create visual representation of stacked ingredient
+        const yPos = 450 - (this.stack.length * 30); // Stack from bottom up
         const ingredientSprite = this.add.image(400, yPos, ingredient);
+        ingredientSprite.setScale(0.8);
         
         // Add a nice scale-in effect
         ingredientSprite.setScale(0);
         this.tweens.add({
             targets: ingredientSprite,
-            scale: 1,
+            scale: 0.8,
             duration: 200,
             ease: 'Back.out'
         });
-
-        this.stackDisplay.push(ingredientSprite);
         
         this.checkOrder();
     }
 
     checkOrder() {
-        if (this.sandwichStack.length === this.currentOrder.ingredients.length) {
+        if (this.stack.length === this.currentOrder.ingredients.length) {
             let correct = true;
-            for (let i = 0; i < this.sandwichStack.length; i++) {
-                if (this.sandwichStack[i] !== this.currentOrder.ingredients[i]) {
+            for (let i = 0; i < this.stack.length; i++) {
+                if (this.stack[i] !== this.currentOrder.ingredients[i]) {
                     correct = false;
                     break;
                 }
@@ -244,20 +314,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     resetOrder() {
-        // Clear the stack with a nice animation
-        this.stackDisplay.forEach((sprite, index) => {
-            this.tweens.add({
-                targets: sprite,
-                x: '+=400',
-                alpha: 0,
-                duration: 300,
-                delay: index * 50,
-                onComplete: () => sprite.destroy()
-            });
-        });
-        
-        this.sandwichStack = [];
-        this.stackDisplay = [];
+        this.stack = [];
         
         if (this.orderTimer) {
             this.orderTimer.remove();
@@ -265,16 +322,72 @@ export default class GameScene extends Phaser.Scene {
         this.createNewOrder();
     }
 
-    displayOrder() {
-        if (this.orderText) {
-            this.orderText.destroy();
+    displayOrder(order) {
+        // Clear any existing tweens
+        if (this.typingTween) {
+            this.typingTween.stop();
         }
-        this.orderText = this.add.text(400, 60, 'Order: ' + this.currentOrder.ingredients.join(' + '), {
-            fontSize: '20px',
-            fill: '#000',
-            backgroundColor: '#ffffff',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5);
+        
+        const fullText = 'Order: ' + order.join(' + ');
+        this.orderText.setText('');
+        
+        // Create typing effect
+        let currentChar = 0;
+        this.typingTween = this.time.addEvent({
+            delay: 30,
+            callback: () => {
+                if (currentChar < fullText.length) {
+                    this.orderText.setText(this.orderText.text + fullText[currentChar]);
+                    currentChar++;
+                }
+            },
+            repeat: fullText.length - 1
+        });
+    }
+
+    updateTimerBar(progress) {
+        this.timerBar.clear();
+        
+        // Calculate color based on progress (green to red)
+        let color;
+        if (progress > 0.6) {
+            color = 0x00ff00;  // Green
+        } else if (progress > 0.3) {
+            color = 0xffff00;  // Yellow
+        } else {
+            color = 0xff0000;  // Red
+        }
+        
+        // Draw timer bar with solid color
+        this.timerBar.fillStyle(color, 1);
+        const width = this.timerBarConfig.width * progress;
+        this.timerBar.fillRoundedRect(
+            this.timerBarConfig.x,
+            this.timerBarConfig.y,
+            width,
+            this.timerBarConfig.height,
+            10
+        );
+
+        // Add border to the filled portion
+        this.timerBar.lineStyle(2, 0xffffff, 0.5);
+        this.timerBar.strokeRoundedRect(
+            this.timerBarConfig.x,
+            this.timerBarConfig.y,
+            width,
+            this.timerBarConfig.height,
+            10
+        );
+    }
+
+    update() {
+        // Update timer bar
+        if (this.orderTimer) {
+            const progress = this.orderTimer.getProgress();
+            this.updateTimerBar(1 - progress);  // Invert progress for countdown effect
+            
+            // We'll handle the color change in updateTimerBar instead
+        }
     }
 
     gameOver() {
@@ -283,20 +396,5 @@ export default class GameScene extends Phaser.Scene {
         this.time.delayedCall(900, () => {
             this.scene.start('GameOverScene', { score: this.score });
         });
-    }
-
-    update() {
-        // Update timer bar
-        if (this.orderTimer) {
-            const progress = this.orderTimer.getProgress();
-            this.timerBar.scaleX = 1 - progress;
-            
-            // Change color to red when time is running out
-            if (progress > 0.7) {
-                this.timerBar.setTint(0xff0000);
-            } else {
-                this.timerBar.clearTint();
-            }
-        }
     }
 }

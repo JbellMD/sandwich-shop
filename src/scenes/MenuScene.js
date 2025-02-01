@@ -39,7 +39,7 @@ export default class MenuScene extends Phaser.Scene {
         const button = this.add.graphics();
         
         // Button container
-        const buttonContainer = this.add.container(400, 300);
+        const buttonContainer = this.add.container(400, 350);  
         buttonContainer.setSize(buttonWidth, buttonHeight);
         
         // Button background
@@ -60,9 +60,23 @@ export default class MenuScene extends Phaser.Scene {
         buttonContainer.add([button, buttonText]);
         buttonContainer.setAlpha(0);
         
-        // Make button interactive
-        buttonContainer.setInteractive(new Phaser.Geom.Rectangle(-buttonWidth/2, -buttonHeight/2, buttonWidth, buttonHeight), Phaser.Geom.Rectangle.Contains);
+        // Make button interactive with a much larger hit area
+        const hitAreaWidth = buttonWidth * 2;  // Double the width
+        const hitAreaHeight = buttonHeight * 2.5;  // 2.5x the height
+        const hitArea = new Phaser.Geom.Rectangle(
+            -hitAreaWidth/2,  // Center the larger hit area
+            -hitAreaHeight/2,
+            hitAreaWidth,
+            hitAreaHeight
+        );
+        buttonContainer.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
         
+        // Debug visualization of hit area (comment out in production)
+        // const hitAreaDebug = this.add.rectangle(400, 350, hitAreaWidth, hitAreaHeight);
+        // hitAreaDebug.setStrokeStyle(2, 0xff0000);
+        // hitAreaDebug.setFillStyle(0xff0000, 0.2);
+        
+        // Add hover effects
         buttonContainer.on('pointerover', () => {
             this.tweens.add({
                 targets: buttonContainer,
@@ -109,7 +123,7 @@ export default class MenuScene extends Phaser.Scene {
             align: 'center'
         };
         
-        const instructions = this.add.text(400, 400, 
+        const instructions = this.add.text(400, 450,  
             'Make sandwiches according to customer orders\nBefore time runs out!', 
             instructionsStyle
         ).setOrigin(0.5);
