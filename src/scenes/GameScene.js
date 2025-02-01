@@ -213,20 +213,58 @@ export default class GameScene extends Phaser.Scene {
     }
 
     createNewOrder() {
-        const ingredients = ['bread_bottom', 'lettuce', 'cheese', 'meat', 'bread_top'];
+        // Clear any existing order
+        if (this.currentOrder) {
+            if (this.typingTween && this.typingTween.destroy) {
+                this.typingTween.destroy();
+            }
+            if (this.orderTimer) {
+                this.orderTimer.remove();
+            }
+        }
+
+        // Generate random order
+        const ingredients = ['bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat', 'bread_top'];
         this.currentOrder = {
             ingredients: ingredients,
-            timeLeft: 20000 // 20 seconds
+            timeLimit: 20000
         };
 
-        // Display order
-        this.displayOrder(this.currentOrder.ingredients);
+        // Display the new order
+        this.displayOrder(this.currentOrder);
 
-        // Start timer
-        this.orderTimer = this.time.addEvent({
-            delay: 20000,
-            callback: this.orderFailed,
-            callbackScope: this
+        // Start the timer
+        this.orderTimer = this.time.delayedCall(this.currentOrder.timeLimit, () => {
+            this.orderFailed();
+        });
+    }
+
+    displayOrder(order) {
+        // If there's an existing typing tween, destroy it properly
+        if (this.typingTween && this.typingTween.destroy) {
+            this.typingTween.destroy();
+        }
+        
+        // Reset the order text
+        this.orderText.setText('');
+        const fullText = `Order: ${order.ingredients.join(' + ')}`;
+        let currentCharacter = 0;
+        
+        // Create new typing tween
+        this.typingTween = this.time.addEvent({
+            delay: 50,
+            callback: () => {
+                currentCharacter++;
+                this.orderText.setText(fullText.substring(0, currentCharacter));
+                
+                if (currentCharacter === fullText.length) {
+                    if (this.typingTween) {
+                        this.typingTween.destroy();
+                        this.typingTween = null;
+                    }
+                }
+            },
+            repeat: fullText.length - 1
         });
     }
 
@@ -357,6 +395,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     orderFailed() {
+        // Clean up existing tweens
+        if (this.typingTween && this.typingTween.destroy) {
+            this.typingTween.destroy();
+        }
+        if (this.orderTimer) {
+            this.orderTimer.remove();
+        }
+
         this.score = Math.max(0, this.score - 50);
         this.scoreText.setText('Score: ' + this.score);
         
@@ -380,6 +426,14 @@ export default class GameScene extends Phaser.Scene {
     }
 
     resetOrder() {
+        // Clean up any existing tweens
+        if (this.typingTween && this.typingTween.destroy) {
+            this.typingTween.destroy();
+        }
+        if (this.orderTimer) {
+            this.orderTimer.remove();
+        }
+
         // Animate and destroy all stack sprites
         this.stackSprites.forEach((sprite, index) => {
             this.tweens.add({
@@ -400,33 +454,9 @@ export default class GameScene extends Phaser.Scene {
         this.stack = [];
         this.stackSprites = [];
         
-        if (this.orderTimer) {
-            this.orderTimer.remove();
-        }
-        
-        this.createNewOrder();
-    }
-
-    displayOrder(order) {
-        // Clear any existing tweens
-        if (this.typingTween) {
-            this.typingTween.stop();
-        }
-        
-        const fullText = 'Order: ' + order.join(' + ');
-        this.orderText.setText('');
-        
-        // Create typing effect
-        let currentChar = 0;
-        this.typingTween = this.time.addEvent({
-            delay: 30,
-            callback: () => {
-                if (currentChar < fullText.length) {
-                    this.orderText.setText(this.orderText.text + fullText[currentChar]);
-                    currentChar++;
-                }
-            },
-            repeat: fullText.length - 1
+        // Create new order after a short delay
+        this.time.delayedCall(300, () => {
+            this.createNewOrder();
         });
     }
 
