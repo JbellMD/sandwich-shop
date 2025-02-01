@@ -4,11 +4,13 @@ export default class GameScene extends Phaser.Scene {
         this.score = 0;
         this.currentOrder = null;
         this.stack = [];
+        this.stackSprites = []; // Track the sprite objects in the stack
     }
 
     init() {
         this.score = 0;
         this.stack = [];
+        this.stackSprites = []; // Track the sprite objects in the stack
     }
 
     create() {
@@ -237,6 +239,28 @@ export default class GameScene extends Phaser.Scene {
         const ingredientSprite = this.add.image(400, yPos, ingredient);
         ingredientSprite.setScale(0.8);
         
+        // Make the ingredient interactive
+        ingredientSprite.setInteractive();
+        
+        // Store the index in the stack
+        ingredientSprite.stackIndex = this.stack.length - 1;
+        
+        // Add hover effects
+        ingredientSprite.on('pointerover', () => {
+            ingredientSprite.setScale(0.9);
+            this.game.canvas.style.cursor = 'pointer';
+        });
+        
+        ingredientSprite.on('pointerout', () => {
+            ingredientSprite.setScale(0.8);
+            this.game.canvas.style.cursor = 'default';
+        });
+        
+        // Add click handler for removal
+        ingredientSprite.on('pointerdown', () => {
+            this.removeIngredient(ingredientSprite.stackIndex);
+        });
+        
         // Add a nice scale-in effect
         ingredientSprite.setScale(0);
         this.tweens.add({
@@ -244,6 +268,48 @@ export default class GameScene extends Phaser.Scene {
             scale: 0.8,
             duration: 200,
             ease: 'Back.out'
+        });
+        
+        // Store the sprite reference
+        this.stackSprites.push(ingredientSprite);
+        
+        this.checkOrder();
+    }
+
+    removeIngredient(index) {
+        // Remove the ingredient from the stack array
+        this.stack.splice(index, 1);
+        
+        // Remove and destroy the clicked sprite
+        const removedSprite = this.stackSprites[index];
+        
+        // Animate the removal
+        this.tweens.add({
+            targets: removedSprite,
+            alpha: 0,
+            scaleX: 0,
+            scaleY: 0,
+            duration: 200,
+            ease: 'Back.in',
+            onComplete: () => {
+                removedSprite.destroy();
+            }
+        });
+        
+        // Remove from sprites array
+        this.stackSprites.splice(index, 1);
+        
+        // Update the positions and indices of remaining ingredients
+        this.stackSprites.forEach((sprite, newIndex) => {
+            sprite.stackIndex = newIndex;
+            
+            // Animate to new position
+            this.tweens.add({
+                targets: sprite,
+                y: 450 - ((newIndex + 1) * 30),
+                duration: 200,
+                ease: 'Power2'
+            });
         });
         
         this.checkOrder();
@@ -314,11 +380,30 @@ export default class GameScene extends Phaser.Scene {
     }
 
     resetOrder() {
+        // Animate and destroy all stack sprites
+        this.stackSprites.forEach((sprite, index) => {
+            this.tweens.add({
+                targets: sprite,
+                alpha: 0,
+                scaleX: 0,
+                scaleY: 0,
+                duration: 200,
+                delay: index * 50,
+                ease: 'Back.in',
+                onComplete: () => {
+                    sprite.destroy();
+                }
+            });
+        });
+        
+        // Clear arrays
         this.stack = [];
+        this.stackSprites = [];
         
         if (this.orderTimer) {
             this.orderTimer.remove();
         }
+        
         this.createNewOrder();
     }
 
