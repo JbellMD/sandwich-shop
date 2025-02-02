@@ -5,6 +5,8 @@ export default class IntroScene extends Phaser.Scene {
 
   preload() {
     // Background is already loaded in BootScene
+    // Load the storyteller image
+    this.load.image('storyteller', 'assets/images/customers/storyteller.jpg');
   }
 
   create() {
@@ -20,9 +22,23 @@ export default class IntroScene extends Phaser.Scene {
     const scale = Math.max(scaleX, scaleY);
     bg.setScale(scale);
 
-    // Add an image of a person for storytelling
-    // Commented out person image until asset is available
-    // this.add.image(width * 0.3, height / 2, 'person').setScale(scale);
+    // Add the storyteller image
+    const storyteller = this.add.image(width * 0.3, height * 0.5, 'storyteller');
+    // Scale the storyteller image appropriately
+    const storytellerScale = Math.min(
+      (height * 0.5) / storyteller.height,  // 50% of screen height
+      (width * 0.3) / storyteller.width     // 30% of screen width
+    );
+    storyteller.setScale(storytellerScale);
+    
+    // Add a fade-in effect for the storyteller
+    storyteller.alpha = 0;
+    this.tweens.add({
+      targets: storyteller,
+      alpha: 1,
+      duration: 1000,
+      ease: 'Power2'
+    });
 
     // Three consecutive dialogue boxes that explain the game
     this.dialogueTexts = [
