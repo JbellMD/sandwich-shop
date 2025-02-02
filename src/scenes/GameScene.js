@@ -97,10 +97,10 @@ export default class GameScene extends Phaser.Scene {
             fill: '#ffffff',
             stroke: '#000000',
             strokeThickness: 2,
-            wordWrap: { width: dialogueBoxWidth - 40 }
+            wordWrap: { width: 330 }
         };
 
-        this.orderText = this.add.text(420, 40, '', orderTextStyle);
+        this.orderText = this.add.text(440, 40, '', orderTextStyle);
 
         // Timer bar with enhanced styling
         const timerBarWidth = 300;
@@ -352,6 +352,43 @@ export default class GameScene extends Phaser.Scene {
             },
             repeat: fullText.length - 1
         });
+    }
+
+    updateOrderDisplay() {
+        // Clear existing text and background
+        if (this.orderText) {
+            this.orderText.destroy();
+        }
+        if (this.orderBackground) {
+            this.orderBackground.destroy();
+        }
+
+        const orderString = 'Order: ' + this.currentOrder.ingredients.join(' + ');
+        
+        // Create new background with larger width
+        const bgWidth = 350;
+        const bgHeight = 60;
+        const bgX = 400;
+        const bgY = 50;
+        
+        this.orderBackground = this.add.graphics()
+            .fillStyle(0x333333, 0.8)
+            .fillRoundedRect(bgX, bgY, bgWidth, bgHeight, 10);
+        
+        // Create new text with adjusted position and wrap width
+        this.orderText = this.add.text(
+            bgX + 20,
+            bgY + 10,
+            orderString,
+            {
+                fontSize: '20px',
+                fill: '#ffffff',
+                wordWrap: { 
+                    width: bgWidth - 40,
+                    useAdvancedWrap: true 
+                }
+            }
+        );
     }
 
     addIngredient(ingredient) {
