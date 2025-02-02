@@ -6,7 +6,7 @@ export default class IntroScene extends Phaser.Scene {
   preload() {
     // Background is already loaded in BootScene
     // Load the storyteller image
-    this.load.image('storyteller', 'assets/images/customers/storyteller.jpg');
+    this.load.image('storyteller', 'assets/images/customers/storyteller.png');
   }
 
   create() {
