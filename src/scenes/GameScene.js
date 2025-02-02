@@ -130,8 +130,8 @@ export default class GameScene extends Phaser.Scene {
         const quitButtonWidth = 100;
         const quitButtonHeight = 40;
         
-        // Create quit button container
-        const quitButtonContainer = this.add.container(750, 30);
+        // Create quit button container - moved to bottom right
+        const quitButtonContainer = this.add.container(750, 550);
         quitButtonContainer.setSize(quitButtonWidth, quitButtonHeight);
         
         // Button background
@@ -189,6 +189,28 @@ export default class GameScene extends Phaser.Scene {
         const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
         const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
         
+        // Create placeholder squares for ingredients
+        const squareSize = 30;
+        const squareColor = 0x000000;
+        const positions = [
+            { x: 200, y: 200 }, { x: 600, y: 200 },
+            { x: 200, y: 250 }, { x: 600, y: 250 },
+            { x: 200, y: 300 }, { x: 600, y: 300 },
+            { x: 200, y: 350 }, { x: 600, y: 350 },
+            { x: 200, y: 400 }, { x: 600, y: 400 }
+        ];
+
+        positions.forEach(pos => {
+            const square = this.add.rectangle(pos.x, pos.y, squareSize, squareSize, squareColor);
+            square.setInteractive();
+            square.on('pointerover', () => {
+                square.setFillStyle(0x333333);
+            });
+            square.on('pointerout', () => {
+                square.setFillStyle(squareColor);
+            });
+        });
+
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
             const x = 150;
