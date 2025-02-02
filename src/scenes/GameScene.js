@@ -186,79 +186,84 @@ export default class GameScene extends Phaser.Scene {
     }
 
     setupIngredients() {
+        // Define ingredients for both sides
         const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
         const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
         
-        // Create placeholder squares for ingredients
-        const squareSize = 30;
-        const squareColor = 0x000000;
-        const positions = [
-            { x: 200, y: 200 }, { x: 600, y: 200 },
-            { x: 200, y: 250 }, { x: 600, y: 250 },
-            { x: 200, y: 300 }, { x: 600, y: 300 },
-            { x: 200, y: 350 }, { x: 600, y: 350 },
-            { x: 200, y: 400 }, { x: 600, y: 400 }
-        ];
-
-        positions.forEach(pos => {
-            const square = this.add.rectangle(pos.x, pos.y, squareSize, squareSize, squareColor);
-            square.setInteractive();
-            square.on('pointerover', () => {
-                square.setFillStyle(0x333333);
-            });
-            square.on('pointerout', () => {
-                square.setFillStyle(squareColor);
-            });
-        });
+        // Color mapping for ingredients
+        const ingredientColors = {
+            bread_top: 0xF4A460,     // Sandy brown
+            bread_bottom: 0xF4A460,   // Sandy brown
+            lettuce: 0x90EE90,       // Light green
+            cheese: 0xFFD700,        // Gold
+            tomato: 0xFF6347,        // Tomato red
+            meat: 0x8B4513,          // Saddle brown
+            bacon: 0xCD5C5C,         // Indian red
+            egg: 0xFFFACD,           // Lemon chiffon
+            mayo: 0xFFFAFA,          // Snow white
+            mustard: 0xFFD700,       // Gold
+            ketchup: 0xFF0000,       // Red
+            onion: 0xDCDCDC          // Gainsboro
+        };
 
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
             const x = 150;
-            const y = 200 + (index * 60);
+            const y = 200 + (index * 50);
             
-            // Add button background
-            const button = this.add.image(x, y, 'ingredient_button');
+            // Create colored square for ingredient
+            const square = this.add.rectangle(x, y, 30, 30, ingredientColors[ingredient]);
+            square.setInteractive();
             
-            // Add ingredient icon
-            const ingredientIcon = this.add.image(x, y, ingredient);
-            ingredientIcon.setScale(0.8); // Slightly smaller scale for better fit
-            
-            // Make both interactive
-            button.setInteractive();
-            ingredientIcon.setInteractive();
-            
-            // Store ingredient name
-            button.ingredient = ingredient;
-            ingredientIcon.ingredient = ingredient;
-            
-            // Setup interactions for both button and icon
-            this.setupIngredientInteraction(button);
-            this.setupIngredientInteraction(ingredientIcon);
+            // Hover effects
+            square.on('pointerover', () => {
+                square.setScale(1.1);
+            });
+            square.on('pointerout', () => {
+                square.setScale(1);
+            });
+
+            square.on('pointerdown', () => {
+                this.addIngredient(ingredient);
+            });
+
+            // Add ingredient label
+            this.add.text(x + 40, y, ingredient.replace('_', ' '), {
+                fontSize: '20px',
+                fill: '#fff',
+                stroke: '#000000',
+                strokeThickness: 4
+            }).setOrigin(0, 0.5);
         });
-        
+
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
             const x = 650;
-            const y = 200 + (index * 60);
+            const y = 200 + (index * 50);
             
-            // Add button background
-            const button = this.add.image(x, y, 'ingredient_button');
+            // Create colored square for ingredient
+            const square = this.add.rectangle(x, y, 30, 30, ingredientColors[ingredient]);
+            square.setInteractive();
             
-            // Add ingredient icon
-            const ingredientIcon = this.add.image(x, y, ingredient);
-            ingredientIcon.setScale(0.8); // Slightly smaller scale for better fit
-            
-            // Make both interactive
-            button.setInteractive();
-            ingredientIcon.setInteractive();
-            
-            // Store ingredient name
-            button.ingredient = ingredient;
-            ingredientIcon.ingredient = ingredient;
-            
-            // Setup interactions for both button and icon
-            this.setupIngredientInteraction(button);
-            this.setupIngredientInteraction(ingredientIcon);
+            // Hover effects
+            square.on('pointerover', () => {
+                square.setScale(1.1);
+            });
+            square.on('pointerout', () => {
+                square.setScale(1);
+            });
+
+            square.on('pointerdown', () => {
+                this.addIngredient(ingredient);
+            });
+
+            // Add ingredient label
+            this.add.text(x - 40, y, ingredient.replace('_', ' '), {
+                fontSize: '20px',
+                fill: '#fff',
+                stroke: '#000000',
+                strokeThickness: 4
+            }).setOrigin(1, 0.5);
         });
     }
 
