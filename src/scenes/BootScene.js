@@ -40,6 +40,17 @@ export default class BootScene extends Phaser.Scene {
         // Create loading text container
         const loadingContainer = this.add.container(400, 300);
         
+        // Create loading text first
+        const loadingText = this.add.text(-60, 0, 'Loading', {
+            fontSize: '32px',
+            fontFamily: 'Arial Black',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 4,
+            align: 'center'
+        }).setOrigin(0.5);
+        loadingContainer.add(loadingText);
+
         // Create dots for animation
         const dotStyle = {
             fontSize: '48px',
@@ -52,21 +63,10 @@ export default class BootScene extends Phaser.Scene {
 
         const dots = [];
         for (let i = 0; i < 3; i++) {
-            const dot = this.add.text(i * 30 - 30, 0, '.', dotStyle).setOrigin(0.5);
+            const dot = this.add.text(20 + (i * 20), 0, '.', dotStyle).setOrigin(0.5);
             dots.push(dot);
             loadingContainer.add(dot);
         }
-
-        // Create loading text
-        const loadingText = this.add.text(-60, 0, 'Loading', {
-            fontSize: '32px',
-            fontFamily: 'Arial Black',
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 4,
-            align: 'center'
-        }).setOrigin(0.5);
-        loadingContainer.add(loadingText);
 
         // Fade in background and title
         this.tweens.add({
