@@ -3,6 +3,7 @@ import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import GameScene from './scenes/GameScene.js';
 import GameOverScene from './scenes/GameOverScene.js';
+import IntroScene from './scenes/IntroScene.js';
 
 const config = {
     type: Phaser.AUTO,
@@ -16,7 +17,7 @@ const config = {
             debug: false
         }
     },
-    scene: [PreloadScene, BootScene, MenuScene, GameScene, GameOverScene]
+    scene: [BootScene, MenuScene, IntroScene, GameScene, GameOverScene]
 };
 
 window.addEventListener('load', () => {

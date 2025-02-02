@@ -124,6 +124,65 @@ export default class GameScene extends Phaser.Scene {
             width: timerBarWidth,
             height: timerBarHeight
         };
+
+        // Add quit button
+        const quitButton = this.add.graphics();
+        const quitButtonWidth = 100;
+        const quitButtonHeight = 40;
+        
+        // Create quit button container
+        const quitButtonContainer = this.add.container(750, 30);
+        quitButtonContainer.setSize(quitButtonWidth, quitButtonHeight);
+        
+        // Button background
+        quitButton.fillStyle(0xff0000, 1);
+        quitButton.fillRoundedRect(-quitButtonWidth/2, -quitButtonHeight/2, quitButtonWidth, quitButtonHeight, 10);
+        quitButton.lineStyle(2, 0xcc0000);
+        quitButton.strokeRoundedRect(-quitButtonWidth/2, -quitButtonHeight/2, quitButtonWidth, quitButtonHeight, 10);
+
+        // Button text
+        const quitText = this.add.text(0, 0, 'Quit', {
+            fontSize: '24px',
+            fontFamily: 'Arial Black',
+            fill: '#ffffff'
+        }).setOrigin(0.5);
+        
+        quitButtonContainer.add([quitButton, quitText]);
+        
+        // Make button interactive
+        quitButtonContainer.setInteractive(new Phaser.Geom.Rectangle(
+            -quitButtonWidth/2,
+            -quitButtonHeight/2,
+            quitButtonWidth,
+            quitButtonHeight
+        ), Phaser.Geom.Rectangle.Contains);
+        
+        // Add hover effects
+        quitButtonContainer.on('pointerover', () => {
+            this.tweens.add({
+                targets: quitButtonContainer,
+                scaleX: 1.1,
+                scaleY: 1.1,
+                duration: 100
+            });
+        });
+        
+        quitButtonContainer.on('pointerout', () => {
+            this.tweens.add({
+                targets: quitButtonContainer,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 100
+            });
+        });
+        
+        // Add click handler
+        quitButtonContainer.on('pointerdown', () => {
+            this.cameras.main.fade(500, 0, 0, 0);
+            this.time.delayedCall(450, () => {
+                this.scene.start('MenuScene');
+            });
+        });
     }
 
     setupIngredients() {

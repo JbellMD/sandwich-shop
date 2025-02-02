@@ -104,7 +104,7 @@ export default class BootScene extends Phaser.Scene {
                 // Fade out everything
                 this.cameras.main.fade(500, 0, 0, 0);
                 this.time.delayedCall(450, () => {
-                    this.scene.start('PreloadScene');
+                    this.scene.start('MenuScene');
                 });
             }
         });
