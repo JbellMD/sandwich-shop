@@ -2,23 +2,25 @@ export default class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
         this.score = 0;
-        this.currentOrder = null;
+        this.currentOrder = { ingredients: [] };
         this.stack = [];
-        this.stackSprites = []; // Track the sprite objects in the stack
+        this.stackSprites = [];
     }
 
     init() {
         this.score = 0;
+        this.currentOrder = { ingredients: [] };
         this.stack = [];
-        this.stackSprites = []; // Track the sprite objects in the stack
+        this.stackSprites = [];
     }
 
     create() {
         // Add background with fade in
         const bg = this.add.image(400, 300, 'background');
-        const scaleX = 800 / bg.width;
-        const scaleY = 600 / bg.height;
-        const scale = Math.min(scaleX, scaleY);
+        // Increase scale to fully cover the canvas
+        const scaleX = 900 / bg.width;
+        const scaleY = 700 / bg.height;
+        const scale = Math.max(scaleX, scaleY);  // Use max instead of min to ensure full coverage
         bg.setScale(scale);
         bg.alpha = 0;
 
@@ -73,34 +75,39 @@ export default class GameScene extends Phaser.Scene {
         this.scoreText = this.add.text(20, 20, 'Score: 0', scoreStyle);
         this.score = 0;
 
-        // Create dialogue box for orders
-        const dialogueBoxWidth = 400;
-        const dialogueBoxHeight = 80;
-        const dialogueBox = this.add.graphics();
+        // Initialize order display container
+        this.orderContainer = this.add.container(600, 50);
         
-        // Add semi-transparent background
-        dialogueBox.fillStyle(0x000000, 0.7);
-        dialogueBox.fillRoundedRect(400, 20, dialogueBoxWidth, dialogueBoxHeight, 15);
+        // Create a semi-transparent dark backdrop
+        const backdropWidth = 450;
+        const backdropHeight = 95;  // Increased height for longer orders
+        const backdrop = this.add.graphics();
+        backdrop.fillStyle(0x000000, 0.7);
+        backdrop.fillRoundedRect(-backdropWidth/2, -backdropHeight/2, backdropWidth, backdropHeight, 15);
         
-        // Add border
-        dialogueBox.lineStyle(3, 0xffffff, 1);
-        dialogueBox.strokeRoundedRect(400, 20, dialogueBoxWidth, dialogueBoxHeight, 15);
+        // Add a decorative border
+        const border = this.add.graphics();
+        border.lineStyle(2, 0xFFFFFF, 0.3);
+        border.strokeRoundedRect(-backdropWidth/2, -backdropHeight/2, backdropWidth, backdropHeight, 15);
         
-        // Add decorative elements
-        dialogueBox.lineStyle(2, 0xffffff, 0.5);
-        dialogueBox.strokeRoundedRect(405, 25, dialogueBoxWidth - 10, dialogueBoxHeight - 10, 12);
-
-        // Create order text with typing effect style
-        const orderTextStyle = {
-            fontSize: '24px',
-            fontFamily: 'Arial',
+        // Add a small "Order" label at the top
+        const orderLabel = this.add.text(-backdropWidth/2 + 20, -backdropHeight/2 + 10, 'ORDER:', {
+            fontSize: '16px',
+            fill: '#FFD700',
+            fontStyle: 'bold'
+        });
+        
+        // Create the main order text
+        this.orderText = this.add.text(0, 15, '', {
+            fontSize: '18px',
             fill: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 2,
-            wordWrap: { width: 330 }
-        };
-
-        this.orderText = this.add.text(440, 40, '', orderTextStyle);
+            align: 'center',
+            wordWrap: { width: backdropWidth - 40 },
+            lineSpacing: 5
+        }).setOrigin(0.5);
+        
+        // Add everything to the container
+        this.orderContainer.add([backdrop, border, orderLabel, this.orderText]);
 
         // Timer bar with enhanced styling
         const timerBarWidth = 300;
@@ -301,94 +308,104 @@ export default class GameScene extends Phaser.Scene {
     createNewOrder() {
         // Clear any existing order
         if (this.currentOrder) {
-            if (this.typingTween && this.typingTween.destroy) {
-                this.typingTween.destroy();
-            }
             if (this.orderTimer) {
                 this.orderTimer.remove();
             }
         }
 
-        // Generate random order
-        const ingredients = ['bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat', 'bread_top'];
-        this.currentOrder = {
-            ingredients: ingredients,
-            timeLimit: 20000
+        // Generate a random order
+        const numIngredients = Phaser.Math.Between(3, 6);
+        const allIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat', 'bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
+        const orderIngredients = [];
+        
+        // Always start with bread_bottom
+        orderIngredients.push('bread_bottom');
+        
+        // Add random ingredients
+        for (let i = 0; i < numIngredients; i++) {
+            const randomIngredient = allIngredients[Phaser.Math.Between(0, allIngredients.length - 1)];
+            if (randomIngredient !== 'bread_bottom' && randomIngredient !== 'bread_top') {
+                orderIngredients.push(randomIngredient);
+            }
+        }
+        
+        // Always end with bread_top
+        orderIngredients.push('bread_top');
+        
+        // Create the order object
+        const order = {
+            ingredients: orderIngredients,
+            timeLimit: 30000
         };
 
-        // Display the new order
-        this.displayOrder(this.currentOrder);
+        // Set and display the order
+        this.currentOrder = order;
+        this.displayOrder(order);
 
         // Start the timer
         this.orderTimer = this.time.delayedCall(this.currentOrder.timeLimit, () => {
             this.orderFailed();
         });
+
+        // Reset and start the timer bar animation
+        this.timerBar.clear();
+        this.timerBar.fillStyle(0x00ff00);
+        this.timerBar.fillRect(250, 460, 300, 20);
+        
+        this.tweens.add({
+            targets: this.timerMask,
+            x: -300,
+            duration: 30000,
+            ease: 'Linear'
+        });
     }
 
     displayOrder(order) {
-        // If there's an existing typing tween, destroy it properly
-        if (this.typingTween && this.typingTween.destroy) {
-            this.typingTween.destroy();
-        }
-        
-        // Reset the order text
-        this.orderText.setText('');
-        const fullText = `Order: ${order.ingredients.join(' + ')}`;
+        // Setup typing animation
+        const ingredients = order.ingredients
+            .map(ing => ing.replace(/_/g, ' '))
+            .join(' + ');
+        const fullText = ingredients;
         let currentCharacter = 0;
         
-        // Create new typing tween
-        this.typingTween = this.time.addEvent({
+        // Clear existing text
+        this.orderText.setText('');
+        
+        // Create typing effect
+        this.typingTimer = this.time.addEvent({
             delay: 50,
             callback: () => {
                 currentCharacter++;
-                this.orderText.setText(fullText.substring(0, currentCharacter));
+                const currentText = fullText.substring(0, currentCharacter);
+                this.orderText.setText(currentText);
                 
-                if (currentCharacter === fullText.length) {
-                    if (this.typingTween) {
-                        this.typingTween.destroy();
-                        this.typingTween = null;
-                    }
-                }
+                // Adjust vertical position based on current text height
+                const textHeight = this.orderText.height;
+                this.orderText.y = -textHeight/2 + 30;  // More space from the top
             },
             repeat: fullText.length - 1
         });
     }
 
     updateOrderDisplay() {
-        // Clear existing text and background
-        if (this.orderText) {
-            this.orderText.destroy();
-        }
-        if (this.orderBackground) {
-            this.orderBackground.destroy();
+        if (!this.orderText) return;
+
+        const ingredients = this.currentOrder.ingredients;
+        if (!ingredients || ingredients.length === 0) {
+            this.orderText.setText('Waiting for order...');
+            return;
         }
 
-        const orderString = 'Order: ' + this.currentOrder.ingredients.join(' + ');
+        // Format the order text nicely
+        const formattedIngredients = ingredients
+            .map(ing => ing.replace(/_/g, ' '))
+            .join(' + ');
+            
+        this.orderText.setText(formattedIngredients);
         
-        // Create new background with larger width
-        const bgWidth = 350;
-        const bgHeight = 60;
-        const bgX = 400;
-        const bgY = 50;
-        
-        this.orderBackground = this.add.graphics()
-            .fillStyle(0x333333, 0.8)
-            .fillRoundedRect(bgX, bgY, bgWidth, bgHeight, 10);
-        
-        // Create new text with adjusted position and wrap width
-        this.orderText = this.add.text(
-            bgX + 20,
-            bgY + 10,
-            orderString,
-            {
-                fontSize: '20px',
-                fill: '#ffffff',
-                wordWrap: { 
-                    width: bgWidth - 40,
-                    useAdvancedWrap: true 
-                }
-            }
-        );
+        // Center the text vertically based on its height
+        const textHeight = this.orderText.height;
+        this.orderText.y = -textHeight/2 + 30;  // More space from the top
     }
 
     addIngredient(ingredient) {
@@ -519,9 +536,6 @@ export default class GameScene extends Phaser.Scene {
 
     orderFailed() {
         // Clean up existing tweens
-        if (this.typingTween && this.typingTween.destroy) {
-            this.typingTween.destroy();
-        }
         if (this.orderTimer) {
             this.orderTimer.remove();
         }
@@ -549,36 +563,26 @@ export default class GameScene extends Phaser.Scene {
     }
 
     resetOrder() {
-        // Clean up any existing tweens
-        if (this.typingTween && this.typingTween.destroy) {
-            this.typingTween.destroy();
+        // Clear any existing typing animation
+        if (this.typingTimer) {
+            this.typingTimer.destroy();
         }
-        if (this.orderTimer) {
-            this.orderTimer.remove();
-        }
-
-        // Animate and destroy all stack sprites
-        this.stackSprites.forEach((sprite, index) => {
-            this.tweens.add({
-                targets: sprite,
-                alpha: 0,
-                scaleX: 0,
-                scaleY: 0,
-                duration: 200,
-                delay: index * 50,
-                ease: 'Back.in',
-                onComplete: () => {
-                    sprite.destroy();
-                }
-            });
-        });
         
-        // Clear arrays
+        // Clear the current order
+        this.currentOrder = {
+            ingredients: []
+        };
+        
+        // Clear any existing stack
         this.stack = [];
+        this.stackSprites.forEach(sprite => sprite.destroy());
         this.stackSprites = [];
         
-        // Create new order after a short delay
-        this.time.delayedCall(300, () => {
+        // Update display
+        this.updateOrderDisplay();
+        
+        // Create a new order after a delay
+        this.time.delayedCall(1000, () => {
             this.createNewOrder();
         });
     }
