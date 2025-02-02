@@ -208,7 +208,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
-            const x = 150;
+            const x = 180;  // Moved right from 150
             const y = 200 + (index * 50);
             
             // Create colored square for ingredient
@@ -228,17 +228,17 @@ export default class GameScene extends Phaser.Scene {
             });
 
             // Add ingredient label - moved to the left of the square
-            this.add.text(x - 40, y, ingredient.replace('_', ' '), {
+            this.add.text(x - 20, y, ingredient.replace('_', ' '), {
                 fontSize: '20px',
                 fill: '#fff',
                 stroke: '#000000',
                 strokeThickness: 4
-            }).setOrigin(1, 0.5);
+            }).setOrigin(1, 0.5);  // Right-align the text
         });
 
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
-            const x = 650;
+            const x = 620;  // Moved left from 650
             const y = 200 + (index * 50);
             
             // Create colored square for ingredient
@@ -258,12 +258,12 @@ export default class GameScene extends Phaser.Scene {
             });
 
             // Add ingredient label - moved to the right of the square
-            this.add.text(x + 40, y, ingredient.replace('_', ' '), {
+            this.add.text(x + 20, y, ingredient.replace('_', ' '), {
                 fontSize: '20px',
                 fill: '#fff',
                 stroke: '#000000',
                 strokeThickness: 4
-            }).setOrigin(0, 0.5);
+            }).setOrigin(0, 0.5);  // Left-align the text
         });
     }
 
