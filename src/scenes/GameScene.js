@@ -227,13 +227,13 @@ export default class GameScene extends Phaser.Scene {
                 this.addIngredient(ingredient);
             });
 
-            // Add ingredient label
-            this.add.text(x + 40, y, ingredient.replace('_', ' '), {
+            // Add ingredient label - moved to the left of the square
+            this.add.text(x - 40, y, ingredient.replace('_', ' '), {
                 fontSize: '20px',
                 fill: '#fff',
                 stroke: '#000000',
                 strokeThickness: 4
-            }).setOrigin(0, 0.5);
+            }).setOrigin(1, 0.5);
         });
 
         // Right side ingredients
@@ -257,13 +257,13 @@ export default class GameScene extends Phaser.Scene {
                 this.addIngredient(ingredient);
             });
 
-            // Add ingredient label
-            this.add.text(x - 40, y, ingredient.replace('_', ' '), {
+            // Add ingredient label - moved to the right of the square
+            this.add.text(x + 40, y, ingredient.replace('_', ' '), {
                 fontSize: '20px',
                 fill: '#fff',
                 stroke: '#000000',
                 strokeThickness: 4
-            }).setOrigin(1, 0.5);
+            }).setOrigin(0, 0.5);
         });
     }
 
