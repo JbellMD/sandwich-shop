@@ -190,34 +190,35 @@ export default class GameScene extends Phaser.Scene {
 
         // Add quit button
         const quitButton = this.add.graphics();
-        const quitButtonWidth = 100;
-        const quitButtonHeight = 40;
-        
+        const quitButtonWidth = 120;  
+        const quitButtonHeight = 50;  
+        const hitAreaPadding = 20;    
+
         // Create quit button container - moved to bottom right
         const quitButtonContainer = this.add.container(750, 550);
-        quitButtonContainer.setSize(quitButtonWidth, quitButtonHeight);
+        quitButtonContainer.setSize(quitButtonWidth + hitAreaPadding, quitButtonHeight + hitAreaPadding);
         
         // Button background
         quitButton.fillStyle(0xff0000, 1);
-        quitButton.fillRoundedRect(-quitButtonWidth/2, -quitButtonHeight/2, quitButtonWidth, quitButtonHeight, 10);
+        quitButton.fillRoundedRect(-quitButtonWidth/2, -quitButtonHeight/2, quitButtonWidth, quitButtonHeight, 12);
         quitButton.lineStyle(2, 0xcc0000);
-        quitButton.strokeRoundedRect(-quitButtonWidth/2, -quitButtonHeight/2, quitButtonWidth, quitButtonHeight, 10);
+        quitButton.strokeRoundedRect(-quitButtonWidth/2, -quitButtonHeight/2, quitButtonWidth, quitButtonHeight, 12);
 
         // Button text
         const quitText = this.add.text(0, 0, 'Quit', {
-            fontSize: '24px',
+            fontSize: '28px',  
             fontFamily: 'Arial Black',
             fill: '#ffffff'
         }).setOrigin(0.5);
         
         quitButtonContainer.add([quitButton, quitText]);
         
-        // Make button interactive
+        // Make button interactive with larger hit area
         quitButtonContainer.setInteractive(new Phaser.Geom.Rectangle(
-            -quitButtonWidth/2,
-            -quitButtonHeight/2,
-            quitButtonWidth,
-            quitButtonHeight
+            -quitButtonWidth/2 - hitAreaPadding/2,
+            -quitButtonHeight/2 - hitAreaPadding/2,
+            quitButtonWidth + hitAreaPadding,
+            quitButtonHeight + hitAreaPadding
         ), Phaser.Geom.Rectangle.Contains);
         
         // Add hover effects
@@ -271,7 +272,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
-            const x = 180;  // Moved right from 150
+            const x = 180;  
             const y = 200 + (index * 50);
             
             // Create colored square for ingredient
@@ -296,12 +297,12 @@ export default class GameScene extends Phaser.Scene {
                 fill: '#fff',
                 stroke: '#000000',
                 strokeThickness: 4
-            }).setOrigin(1, 0.5);  // Right-align the text
+            }).setOrigin(1, 0.5);  
         });
 
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
-            const x = 620;  // Moved left from 650
+            const x = 620;  
             const y = 200 + (index * 50);
             
             // Create colored square for ingredient
@@ -326,7 +327,7 @@ export default class GameScene extends Phaser.Scene {
                 fill: '#fff',
                 stroke: '#000000',
                 strokeThickness: 4
-            }).setOrigin(0, 0.5);  // Left-align the text
+            }).setOrigin(0, 0.5);  
         });
     }
 
@@ -338,7 +339,7 @@ export default class GameScene extends Phaser.Scene {
             if (object.texture.key === 'ingredient_button') {
                 object.setTint(0xdddddd);
             } else {
-                object.setScale(0.9); // Slightly larger on hover for ingredients
+                object.setScale(0.9); 
             }
         });
         
@@ -346,7 +347,7 @@ export default class GameScene extends Phaser.Scene {
             if (object.texture.key === 'ingredient_button') {
                 object.clearTint();
             } else {
-                object.setScale(0.8); // Return to normal scale
+                object.setScale(0.8); 
             }
         });
     }
@@ -437,7 +438,7 @@ export default class GameScene extends Phaser.Scene {
                 
                 // Adjust vertical position based on current text height
                 const textHeight = this.orderText.height;
-                this.orderText.y = -textHeight/2 + 30;  // More space from the top
+                this.orderText.y = -textHeight/2 + 30;  
             },
             repeat: fullText.length - 1
         });
@@ -461,7 +462,7 @@ export default class GameScene extends Phaser.Scene {
         
         // Center the text vertically based on its height
         const textHeight = this.orderText.height;
-        this.orderText.y = -textHeight/2 + 30;  // More space from the top
+        this.orderText.y = -textHeight/2 + 30;  
     }
 
     addIngredient(ingredient) {
@@ -469,7 +470,7 @@ export default class GameScene extends Phaser.Scene {
         this.stack.push(ingredient);
         
         // Create visual representation of stacked ingredient
-        const yPos = 450 - (this.stack.length * 30); // Stack from bottom up
+        const yPos = 450 - (this.stack.length * 30); 
         const ingredientSprite = this.add.image(400, yPos, ingredient);
         ingredientSprite.setScale(0.8);
         
@@ -649,11 +650,11 @@ export default class GameScene extends Phaser.Scene {
         // Calculate color based on progress (green to red)
         let color;
         if (progress > 0.6) {
-            color = 0x00ff00;  // Green
+            color = 0x00ff00;  
         } else if (progress > 0.3) {
-            color = 0xffff00;  // Yellow
+            color = 0xffff00;  
         } else {
-            color = 0xff0000;  // Red
+            color = 0xff0000;  
         }
         
         // Draw timer bar with solid color
@@ -682,7 +683,7 @@ export default class GameScene extends Phaser.Scene {
         // Update timer bar
         if (this.orderTimer) {
             const progress = this.orderTimer.getProgress();
-            this.updateTimerBar(1 - progress);  // Invert progress for countdown effect
+            this.updateTimerBar(1 - progress);  
             
             // We'll handle the color change in updateTimerBar instead
         }
