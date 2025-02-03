@@ -63,10 +63,10 @@ export default class GameScene extends Phaser.Scene {
             return;
         }
         
-        // Calculate scale to fit while maintaining aspect ratio (contain)
+        // Scale background to cover the entire viewport (no white space)
         const scaleX = this.cameras.main.width / bg.width;
         const scaleY = this.cameras.main.height / bg.height;
-        const scale = Math.min(scaleX, scaleY);
+        const scale = Math.max(scaleX, scaleY); // Use max to cover the viewport
         
         // Center and scale the background
         bg.setScale(scale);
