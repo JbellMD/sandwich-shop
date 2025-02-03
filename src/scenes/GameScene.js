@@ -16,13 +16,69 @@ export default class GameScene extends Phaser.Scene {
 
     create() {
         // Add background with fade in
-        const bg = this.add.image(400, 300, 'background');
-        // Increase scale to fully cover the canvas
-        const scaleX = 900 / bg.width;
-        const scaleY = 700 / bg.height;
-        const scale = Math.max(scaleX, scaleY);  // Use max instead of min to ensure full coverage
+        let bg;
+        
+        // Log available textures
+        console.log('Available textures:', Object.keys(this.textures.list));
+        
+        // Inspect background texture
+        const bgTexture = this.textures.get('background');
+        console.log('Original background texture:', {
+            key: bgTexture.key,
+            frameTotal: bgTexture.frameTotal,
+            source: bgTexture.source[0]?.width + 'x' + bgTexture.source[0]?.height
+        });
+        
+        // Try to create background3 first
+        try {
+            console.log('Attempting to create background3...');
+            // Check if texture exists before creating sprite
+            if (this.textures.exists('background3')) {
+                const bg3Texture = this.textures.get('background3');
+                console.log('Background3 texture found:', {
+                    key: bg3Texture.key,
+                    frameTotal: bg3Texture.frameTotal,
+                    source: bg3Texture.source[0]?.width + 'x' + bg3Texture.source[0]?.height
+                });
+                bg = this.add.sprite(400, 300, 'background3');
+                console.log('Successfully created background3');
+            } else {
+                console.error('background3 texture not found in texture manager');
+                throw new Error('Texture not found');
+            }
+        } catch (error) {
+            console.error('Failed to create background3:', error);
+            console.log('Falling back to original background...');
+            try {
+                bg = this.add.sprite(400, 300, 'background');
+                console.log('Successfully created fallback background');
+            } catch (fallbackError) {
+                console.error('Failed to create fallback background:', fallbackError);
+                return;
+            }
+        }
+        
+        if (!bg || !bg.width || !bg.height) {
+            console.error('Background invalid or has no dimensions');
+            return;
+        }
+        
+        // Calculate scale to fit while maintaining aspect ratio (contain)
+        const scaleX = this.cameras.main.width / bg.width;
+        const scaleY = this.cameras.main.height / bg.height;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Center and scale the background
         bg.setScale(scale);
+        bg.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
+        bg.setOrigin(0.5);
         bg.alpha = 0;
+        this.tweens.add({
+            targets: bg,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2'
+        });
 
         // Setup UI and ingredients
         this.setupUI();

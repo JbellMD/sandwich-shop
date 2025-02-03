@@ -1,41 +1,70 @@
-export default class PreloadScene extends Phaser.Scene {
+class PreloadScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'PreloadScene' });
+        super('PreloadScene');
     }
 
     preload() {
         // Create loading bar
         this.createLoadingBar();
 
+        // Add load event listeners
+        this.load.on('loaderror', (fileObj) => {
+            console.error('PreloadScene: Error loading asset:', {
+                key: fileObj.key,
+                url: fileObj.url,
+                path: this.load.path
+            });
+        });
+
+        this.load.on('filecomplete', (key) => {
+            console.log('PreloadScene: Successfully loaded:', key);
+        });
+
+        this.load.on('complete', () => {
+            console.log('PreloadScene: All assets loaded');
+            console.log('PreloadScene: Final texture list:', Object.keys(this.textures.list));
+            this.scene.start('MenuScene');
+        });
+
+        // Set base path for ingredients
+        this.load.setPath('assets/images/ingredients');
+
         // Load ingredient sprites
-        this.load.image('bread_top', 'assets/images/ingredients/bread_top.png');
-        this.load.image('bread_bottom', 'assets/images/ingredients/bread_bottom.png');
-        this.load.image('lettuce', 'assets/images/ingredients/lettuce.png');
-        this.load.image('cheese', 'assets/images/ingredients/cheese.png');
-        this.load.image('tomato', 'assets/images/ingredients/tomato.png');
-        this.load.image('meat', 'assets/images/ingredients/meat.png');
-        this.load.image('bacon', 'assets/images/ingredients/bacon.png');
-        this.load.image('egg', 'assets/images/ingredients/egg.png');
-        this.load.image('mayo', 'assets/images/ingredients/mayo.png');
-        this.load.image('mustard', 'assets/images/ingredients/mustard.png');
-        this.load.image('ketchup', 'assets/images/ingredients/ketchup.png');
-        this.load.image('onion', 'assets/images/ingredients/onion.png');
+        console.log('PreloadScene: Loading ingredients...');
+        this.load.image('bread_top', 'bread_top.png');
+        this.load.image('bread_bottom', 'bread_bottom.png');
+        this.load.image('lettuce', 'lettuce.png');
+        this.load.image('cheese', 'cheese.png');
+        this.load.image('tomato', 'tomato.png');
+        this.load.image('meat', 'meat.png');
+        this.load.image('bacon', 'bacon.png');
+        this.load.image('egg', 'egg.png');
+        this.load.image('mayo', 'mayo.png');
+        this.load.image('mustard', 'mustard.png');
+        this.load.image('ketchup', 'ketchup.png');
+        this.load.image('onion', 'onion.png');
 
         // Load UI elements
-        this.load.image('order_box', 'assets/images/ui/order_box.png');
-        this.load.image('timer_bar_bg', 'assets/images/ui/timer_bar_bg.png');
-        this.load.image('timer_bar_fill', 'assets/images/ui/timer_bar_fill.png');
-        this.load.image('button_start', 'assets/images/ui/button_start.png');
-        this.load.image('ingredient_button', 'assets/images/ui/ingredient_button.png');
-        this.load.image('stack_area', 'assets/images/ui/stack_area.png');
-
-        // Load background
-        this.load.image('background', 'assets/images/ui/background.jpg');
+        console.log('PreloadScene: Loading UI elements...');
+        this.load.setPath('assets/images/ui');
+        this.load.image('order_box', 'order_box.png');
+        this.load.image('timer_bar_bg', 'timer_bar_bg.png');
+        this.load.image('timer_bar_fill', 'timer_bar_fill.png');
+        this.load.image('button_start', 'button_start.png');
+        this.load.image('ingredient_button', 'ingredient_button.png');
+        this.load.image('stack_area', 'stack_area.png');
 
         // Load customer avatars
-        this.load.image('customer1', 'assets/images/customers/customer1.png');
-        this.load.image('customer2', 'assets/images/customers/customer2.png');
-        this.load.image('customer3', 'assets/images/customers/customer3.png');
+        console.log('PreloadScene: Loading customer avatars...');
+        this.load.setPath('assets/images/customers');
+        this.load.image('customer1', 'customer1.png');
+        this.load.image('customer2', 'customer2.png');
+        this.load.image('customer3', 'customer3.png');
+    }
+
+    create() {
+        console.log('PreloadScene: Starting MenuScene...');
+        this.scene.start('MenuScene');
     }
 
     createLoadingBar() {
@@ -55,26 +84,10 @@ export default class PreloadScene extends Phaser.Scene {
         
         this.load.on('progress', (value) => {
             progressBar.clear();
-            progressBar.fillStyle(0x00ff00, 1);
+            progressBar.fillStyle(0xffffff, 1);
             progressBar.fillRect(width / 4 + 10, height / 2 - 20, (width / 2 - 20) * value, 30);
         });
-        
-        this.load.on('complete', () => {
-            progressBar.destroy();
-            progressBox.destroy();
-            loadingText.destroy();
-        });
-    }
-
-    create() {
-        // Add background
-        const bg = this.add.image(400, 300, 'background');
-        // Scale the background to fit the game width while maintaining aspect ratio
-        const scaleX = 800 / bg.width;
-        const scaleY = 600 / bg.height;
-        const scale = Math.min(scaleX, scaleY);
-        bg.setScale(scale);
-
-        this.scene.start('MenuScene');
     }
 }
+
+export default PreloadScene;

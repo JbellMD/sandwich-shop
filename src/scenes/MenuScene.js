@@ -6,10 +6,16 @@ export default class MenuScene extends Phaser.Scene {
     create() {
         // Add background with fade in
         const bg = this.add.image(400, 300, 'background');
-        const scaleX = 800 / bg.width;
-        const scaleY = 600 / bg.height;
+        
+        // Calculate scale to fit while maintaining aspect ratio (contain)
+        const scaleX = this.cameras.main.width / bg.width;
+        const scaleY = this.cameras.main.height / bg.height;
         const scale = Math.min(scaleX, scaleY);
+        
+        // Center and scale the background
         bg.setScale(scale);
+        bg.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
+        bg.setOrigin(0.5);
         bg.alpha = 0;
         
         // Create title text with shadow effect
