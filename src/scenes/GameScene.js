@@ -15,6 +15,16 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create() {
+        // Add black background first
+        const blackBg = this.add.rectangle(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY,
+            this.cameras.main.width,
+            this.cameras.main.height,
+            0x000000
+        );
+        blackBg.setDepth(-1); // Ensure it's behind everything
+        
         // Add background with fade in
         let bg;
         
