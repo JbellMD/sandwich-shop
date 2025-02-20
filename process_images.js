@@ -5,6 +5,9 @@ const path = require('path');
 const ingredientsDir = path.join(__dirname, 'assets', 'images', 'ingredients');
 const processedDir = path.join(__dirname, 'assets', 'images', 'ingredients_processed');
 
+// Target size for all ingredients
+const TARGET_SIZE = 200;
+
 // Create processed directory if it doesn't exist
 if (!fs.existsSync(processedDir)) {
     fs.mkdirSync(processedDir, { recursive: true });
@@ -19,22 +22,20 @@ async function processImage(file) {
 
     try {
         await sharp(inputPath)
-            .ensureAlpha()  // Ensure alpha channel exists
-            .removeAlpha()  // Remove existing alpha
-            .flatten({ background: { r: 255, g: 255, b: 255 } })  // Convert to white background
-            .toColorspace('b-w')  // Convert to black and white
-            .threshold(250)  // High threshold to identify white areas
-            .toColorspace('srgb')  // Back to RGB
-            .extractChannel(0)  // Extract the threshold result
-            .negate()  // Invert to use as alpha
-            .toBuffer()
-            .then(alphaBuffer => {
-                // Process original image with new alpha channel
-                return sharp(inputPath)
-                    .ensureAlpha()
-                    .joinChannel(alphaBuffer)  // Use our processed alpha channel
-                    .toFile(outputPath);
-            });
+            // Resize maintaining aspect ratio
+            .resize(TARGET_SIZE, TARGET_SIZE, {
+                fit: 'contain',
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            })
+            // Ensure we have transparency
+            .ensureAlpha()
+            // Remove white background
+            .flatten({ background: { r: 255, g: 255, b: 255 } })
+            .toColourspace('b-w')
+            .threshold(240)
+            .toColourspace('srgb')
+            .png()
+            .toFile(outputPath);
 
         console.log(`Processed ${file}`);
     } catch (error) {
@@ -42,7 +43,12 @@ async function processImage(file) {
     }
 }
 
-// Process all images
-Promise.all(files.map(processImage))
-    .then(() => console.log('All images processed'))
-    .catch(err => console.error('Error:', err));
+// Process all images sequentially to avoid memory issues
+async function processAllImages() {
+    for (const file of files) {
+        await processImage(file);
+    }
+    console.log('All images processed');
+}
+
+processAllImages().catch(err => console.error('Error:', err));

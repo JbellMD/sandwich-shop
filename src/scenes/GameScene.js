@@ -276,6 +276,9 @@ export default class GameScene extends Phaser.Scene {
         const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
         const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
         
+        const INGREDIENT_SCALE = 0.25; // Increased scale for our processed images
+        const HOVER_SCALE = 0.27;      // Slightly larger for hover effect
+        
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
             const x = 180;  
@@ -283,14 +286,14 @@ export default class GameScene extends Phaser.Scene {
             
             // Create ingredient sprite
             const sprite = this.add.sprite(x, y, ingredient);
-            sprite.setScale(0.15);  // Reduced scale
+            sprite.setScale(INGREDIENT_SCALE);
             sprite.setInteractive();
             
             // Hover effects
             sprite.on('pointerover', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.17,  // Slightly larger on hover
+                    scale: HOVER_SCALE,
                     duration: 100
                 });
             });
@@ -298,7 +301,7 @@ export default class GameScene extends Phaser.Scene {
             sprite.on('pointerout', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.15,  // Back to normal scale
+                    scale: INGREDIENT_SCALE,
                     duration: 100
                 });
             });
@@ -315,14 +318,14 @@ export default class GameScene extends Phaser.Scene {
             
             // Create ingredient sprite
             const sprite = this.add.sprite(x, y, ingredient);
-            sprite.setScale(0.15);  // Reduced scale
+            sprite.setScale(INGREDIENT_SCALE);
             sprite.setInteractive();
             
             // Hover effects
             sprite.on('pointerover', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.17,  // Slightly larger on hover
+                    scale: HOVER_SCALE,
                     duration: 100
                 });
             });
@@ -330,7 +333,7 @@ export default class GameScene extends Phaser.Scene {
             sprite.on('pointerout', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.15,  // Back to normal scale
+                    scale: INGREDIENT_SCALE,
                     duration: 100
                 });
             });
@@ -482,7 +485,7 @@ export default class GameScene extends Phaser.Scene {
         // Create visual representation of stacked ingredient
         const yPos = 450 - (this.stack.length * 30); 
         const ingredientSprite = this.add.image(400, yPos, ingredient);
-        ingredientSprite.setScale(0.15);  // Match the scale of selection sprites
+        ingredientSprite.setScale(0.25);  // Match the scale of selection sprites
         
         // Make the ingredient interactive
         ingredientSprite.setInteractive();
@@ -492,12 +495,12 @@ export default class GameScene extends Phaser.Scene {
         
         // Add hover effects
         ingredientSprite.on('pointerover', () => {
-            ingredientSprite.setScale(0.17);  // Match hover scale of selection sprites
+            ingredientSprite.setScale(0.27);  // Match hover scale of selection sprites
             this.game.canvas.style.cursor = 'pointer';
         });
         
         ingredientSprite.on('pointerout', () => {
-            ingredientSprite.setScale(0.15);  // Match normal scale of selection sprites
+            ingredientSprite.setScale(0.25);  // Match normal scale of selection sprites
             this.game.canvas.style.cursor = 'default';
         });
         
@@ -510,7 +513,7 @@ export default class GameScene extends Phaser.Scene {
         ingredientSprite.setScale(0);
         this.tweens.add({
             targets: ingredientSprite,
-            scale: 0.15,  // Match the scale of selection sprites
+            scale: 0.25,  // Match the scale of selection sprites
             duration: 200,
             ease: 'Back.out'
         });
