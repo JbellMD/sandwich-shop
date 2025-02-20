@@ -7,6 +7,18 @@ export default class GameScene extends Phaser.Scene {
         this.stackSprites = [];
     }
 
+    preload() {
+        // Load all ingredient images
+        const ingredients = [
+            'bacon', 'bread_bottom', 'bread_top', 'cheese', 'egg',
+            'ketchup', 'lettuce', 'mayo', 'meat', 'mustard', 'onion', 'tomato'
+        ];
+
+        ingredients.forEach(ingredient => {
+            this.load.image(ingredient, `assets/images/ingredients/${ingredient}.png`);
+        });
+    }
+
     init() {
         this.score = 0;
         this.currentOrder = { ingredients: [] };
@@ -264,80 +276,68 @@ export default class GameScene extends Phaser.Scene {
         const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
         const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
         
-        // Color mapping for ingredients
-        const ingredientColors = {
-            bread_top: 0xF4A460,     // Sandy brown
-            bread_bottom: 0xF4A460,   // Sandy brown
-            lettuce: 0x90EE90,       // Light green
-            cheese: 0xFFD700,        // Gold
-            tomato: 0xFF6347,        // Tomato red
-            meat: 0x8B4513,          // Saddle brown
-            bacon: 0xCD5C5C,         // Indian red
-            egg: 0xFFFACD,           // Lemon chiffon
-            mayo: 0xFFFAFA,          // Snow white
-            mustard: 0xFFD700,       // Gold
-            ketchup: 0xFF0000,       // Red
-            onion: 0xDCDCDC          // Gainsboro
-        };
-
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
             const x = 180;  
-            const y = 200 + (index * 50);
+            const y = 200 + (index * 60);  // Increased spacing for images
             
-            // Create colored square for ingredient
-            const square = this.add.rectangle(x, y, 30, 30, ingredientColors[ingredient]);
-            square.setInteractive();
+            // Create ingredient sprite
+            const sprite = this.add.sprite(x, y, ingredient);
+            sprite.setScale(0.4);  // Adjust scale as needed
+            sprite.setInteractive();
             
             // Hover effects
-            square.on('pointerover', () => {
-                square.setScale(1.1);
+            sprite.on('pointerover', () => {
+                this.tweens.add({
+                    targets: sprite,
+                    scale: 0.45,
+                    duration: 100
+                });
             });
-            square.on('pointerout', () => {
-                square.setScale(1);
+            
+            sprite.on('pointerout', () => {
+                this.tweens.add({
+                    targets: sprite,
+                    scale: 0.4,
+                    duration: 100
+                });
             });
 
-            square.on('pointerdown', () => {
+            sprite.on('pointerdown', () => {
                 this.addIngredient(ingredient);
             });
-
-            // Add ingredient label - moved to the left of the square
-            this.add.text(x - 20, y, ingredient.replace('_', ' '), {
-                fontSize: '20px',
-                fill: '#fff',
-                stroke: '#000000',
-                strokeThickness: 4
-            }).setOrigin(1, 0.5);  
         });
 
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
             const x = 620;  
-            const y = 200 + (index * 50);
+            const y = 200 + (index * 60);  // Increased spacing for images
             
-            // Create colored square for ingredient
-            const square = this.add.rectangle(x, y, 30, 30, ingredientColors[ingredient]);
-            square.setInteractive();
+            // Create ingredient sprite
+            const sprite = this.add.sprite(x, y, ingredient);
+            sprite.setScale(0.4);  // Adjust scale as needed
+            sprite.setInteractive();
             
             // Hover effects
-            square.on('pointerover', () => {
-                square.setScale(1.1);
+            sprite.on('pointerover', () => {
+                this.tweens.add({
+                    targets: sprite,
+                    scale: 0.45,
+                    duration: 100
+                });
             });
-            square.on('pointerout', () => {
-                square.setScale(1);
+            
+            sprite.on('pointerout', () => {
+                this.tweens.add({
+                    targets: sprite,
+                    scale: 0.4,
+                    duration: 100
+                });
             });
 
-            square.on('pointerdown', () => {
+            sprite.on('pointerdown', () => {
                 this.addIngredient(ingredient);
             });
-
-            // Add ingredient label - moved to the right of the square
-            this.add.text(x + 20, y, ingredient.replace('_', ' '), {
-                fontSize: '20px',
-                fill: '#fff',
-                stroke: '#000000',
-                strokeThickness: 4
-            }).setOrigin(0, 0.5);  
         });
     }
 
