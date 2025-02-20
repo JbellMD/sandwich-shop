@@ -538,23 +538,22 @@ export default class GameScene extends Phaser.Scene {
             ease: 'Back.in',
             onComplete: () => {
                 removedSprite.destroy();
+                // Remove from sprites array after destruction
+                this.stackSprites.splice(index, 1);
+                
+                // Update the positions and indices of remaining ingredients
+                this.stackSprites.forEach((sprite, newIndex) => {
+                    sprite.stackIndex = newIndex;
+                    
+                    // Animate to new position
+                    this.tweens.add({
+                        targets: sprite,
+                        y: 450 - ((newIndex + 1) * 30),
+                        duration: 200,
+                        ease: 'Power2'
+                    });
+                });
             }
-        });
-        
-        // Remove from sprites array
-        this.stackSprites.splice(index, 1);
-        
-        // Update the positions and indices of remaining ingredients
-        this.stackSprites.forEach((sprite, newIndex) => {
-            sprite.stackIndex = newIndex;
-            
-            // Animate to new position
-            this.tweens.add({
-                targets: sprite,
-                y: 450 - ((newIndex + 1) * 30),
-                duration: 200,
-                ease: 'Power2'
-            });
         });
         
         this.checkOrder();
