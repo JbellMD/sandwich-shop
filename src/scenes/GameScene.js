@@ -482,7 +482,7 @@ export default class GameScene extends Phaser.Scene {
         // Create visual representation of stacked ingredient
         const yPos = 450 - (this.stack.length * 30); 
         const ingredientSprite = this.add.image(400, yPos, ingredient);
-        ingredientSprite.setScale(0.8);
+        ingredientSprite.setScale(0.15);  // Match the scale of selection sprites
         
         // Make the ingredient interactive
         ingredientSprite.setInteractive();
@@ -492,12 +492,12 @@ export default class GameScene extends Phaser.Scene {
         
         // Add hover effects
         ingredientSprite.on('pointerover', () => {
-            ingredientSprite.setScale(0.9);
+            ingredientSprite.setScale(0.17);  // Match hover scale of selection sprites
             this.game.canvas.style.cursor = 'pointer';
         });
         
         ingredientSprite.on('pointerout', () => {
-            ingredientSprite.setScale(0.8);
+            ingredientSprite.setScale(0.15);  // Match normal scale of selection sprites
             this.game.canvas.style.cursor = 'default';
         });
         
@@ -510,7 +510,7 @@ export default class GameScene extends Phaser.Scene {
         ingredientSprite.setScale(0);
         this.tweens.add({
             targets: ingredientSprite,
-            scale: 0.8,
+            scale: 0.15,  // Match the scale of selection sprites
             duration: 200,
             ease: 'Back.out'
         });
