@@ -276,14 +276,16 @@ export default class GameScene extends Phaser.Scene {
         const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
         const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
         
-        const INGREDIENT_SCALE = 0.12; // Reduced scale
-        const HOVER_SCALE = 0.14;      // Slightly larger for hover effect
-        const VERTICAL_SPACING = 35;    // Reduced vertical spacing
-        const START_Y = 150;           // Start higher up
+        const INGREDIENT_SCALE = 0.12; // Current scale
+        const HOVER_SCALE = 0.14;      // Hover effect
+        const VERTICAL_SPACING = 50;    // Increased spacing between ingredients
+        const START_Y = 140;           // Start slightly higher to accommodate increased spacing
+        const LEFT_X = 160;            // Moved slightly left
+        const RIGHT_X = 640;           // Moved slightly right
         
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
-            const x = 180;  
+            const x = LEFT_X;  
             const y = START_Y + (index * VERTICAL_SPACING);
             
             // Create ingredient sprite
@@ -315,7 +317,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
-            const x = 620;  
+            const x = RIGHT_X;  
             const y = START_Y + (index * VERTICAL_SPACING);
             
             // Create ingredient sprite
