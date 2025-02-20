@@ -276,13 +276,15 @@ export default class GameScene extends Phaser.Scene {
         const leftIngredients = ['bread_top', 'bread_bottom', 'lettuce', 'cheese', 'tomato', 'meat'];
         const rightIngredients = ['bacon', 'egg', 'mayo', 'mustard', 'ketchup', 'onion'];
         
-        const INGREDIENT_SCALE = 0.25; // Increased scale for our processed images
-        const HOVER_SCALE = 0.27;      // Slightly larger for hover effect
+        const INGREDIENT_SCALE = 0.12; // Reduced scale
+        const HOVER_SCALE = 0.14;      // Slightly larger for hover effect
+        const VERTICAL_SPACING = 35;    // Reduced vertical spacing
+        const START_Y = 150;           // Start higher up
         
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
             const x = 180;  
-            const y = 200 + (index * 45);  // Reduced spacing
+            const y = START_Y + (index * VERTICAL_SPACING);
             
             // Create ingredient sprite
             const sprite = this.add.sprite(x, y, ingredient);
@@ -314,7 +316,7 @@ export default class GameScene extends Phaser.Scene {
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
             const x = 620;  
-            const y = 200 + (index * 45);  // Reduced spacing
+            const y = START_Y + (index * VERTICAL_SPACING);
             
             // Create ingredient sprite
             const sprite = this.add.sprite(x, y, ingredient);
@@ -483,9 +485,9 @@ export default class GameScene extends Phaser.Scene {
         this.stack.push(ingredient);
         
         // Create visual representation of stacked ingredient
-        const yPos = 450 - (this.stack.length * 30); 
+        const yPos = 450 - (this.stack.length * 20); // Reduced vertical spacing for stacked ingredients
         const ingredientSprite = this.add.image(400, yPos, ingredient);
-        ingredientSprite.setScale(0.25);  // Match the scale of selection sprites
+        ingredientSprite.setScale(0.12);  // Match the scale of selection sprites
         
         // Make the ingredient interactive
         ingredientSprite.setInteractive();
@@ -495,12 +497,12 @@ export default class GameScene extends Phaser.Scene {
         
         // Add hover effects
         ingredientSprite.on('pointerover', () => {
-            ingredientSprite.setScale(0.27);  // Match hover scale of selection sprites
+            ingredientSprite.setScale(0.14);  // Match hover scale of selection sprites
             this.game.canvas.style.cursor = 'pointer';
         });
         
         ingredientSprite.on('pointerout', () => {
-            ingredientSprite.setScale(0.25);  // Match normal scale of selection sprites
+            ingredientSprite.setScale(0.12);  // Match normal scale of selection sprites
             this.game.canvas.style.cursor = 'default';
         });
         
@@ -513,7 +515,7 @@ export default class GameScene extends Phaser.Scene {
         ingredientSprite.setScale(0);
         this.tweens.add({
             targets: ingredientSprite,
-            scale: 0.25,  // Match the scale of selection sprites
+            scale: 0.12,  // Match the scale of selection sprites
             duration: 200,
             ease: 'Back.out'
         });
@@ -551,7 +553,7 @@ export default class GameScene extends Phaser.Scene {
                     // Animate to new position
                     this.tweens.add({
                         targets: sprite,
-                        y: 450 - ((newIndex + 1) * 30),
+                        y: 450 - ((newIndex + 1) * 20),
                         duration: 200,
                         ease: 'Power2'
                     });
