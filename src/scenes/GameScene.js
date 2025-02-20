@@ -15,7 +15,7 @@ export default class GameScene extends Phaser.Scene {
         ];
 
         ingredients.forEach(ingredient => {
-            this.load.image(ingredient, `assets/images/ingredients/${ingredient}.png`);
+            this.load.image(ingredient, `assets/images/ingredients_processed/${ingredient}.png`);
         });
     }
 
@@ -279,18 +279,18 @@ export default class GameScene extends Phaser.Scene {
         // Left side ingredients
         leftIngredients.forEach((ingredient, index) => {
             const x = 180;  
-            const y = 200 + (index * 60);  // Increased spacing for images
+            const y = 200 + (index * 45);  // Reduced spacing
             
             // Create ingredient sprite
             const sprite = this.add.sprite(x, y, ingredient);
-            sprite.setScale(0.4);  // Adjust scale as needed
+            sprite.setScale(0.15);  // Reduced scale
             sprite.setInteractive();
             
             // Hover effects
             sprite.on('pointerover', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.45,
+                    scale: 0.17,  // Slightly larger on hover
                     duration: 100
                 });
             });
@@ -298,7 +298,7 @@ export default class GameScene extends Phaser.Scene {
             sprite.on('pointerout', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.4,
+                    scale: 0.15,  // Back to normal scale
                     duration: 100
                 });
             });
@@ -311,18 +311,18 @@ export default class GameScene extends Phaser.Scene {
         // Right side ingredients
         rightIngredients.forEach((ingredient, index) => {
             const x = 620;  
-            const y = 200 + (index * 60);  // Increased spacing for images
+            const y = 200 + (index * 45);  // Reduced spacing
             
             // Create ingredient sprite
             const sprite = this.add.sprite(x, y, ingredient);
-            sprite.setScale(0.4);  // Adjust scale as needed
+            sprite.setScale(0.15);  // Reduced scale
             sprite.setInteractive();
             
             // Hover effects
             sprite.on('pointerover', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.45,
+                    scale: 0.17,  // Slightly larger on hover
                     duration: 100
                 });
             });
@@ -330,7 +330,7 @@ export default class GameScene extends Phaser.Scene {
             sprite.on('pointerout', () => {
                 this.tweens.add({
                     targets: sprite,
-                    scale: 0.4,
+                    scale: 0.15,  // Back to normal scale
                     duration: 100
                 });
             });
